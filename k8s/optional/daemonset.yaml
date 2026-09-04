@@ -1,0 +1,42 @@
+# Optional exercise: run one small Pod on every Kubernetes node.
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: taskboard-node-reporter
+  namespace: taskboard
+spec:
+  selector:
+    matchLabels:
+      app: taskboard-node-reporter
+  template:
+    metadata:
+      labels:
+        app: taskboard-node-reporter
+    spec:
+      containers:
+        - name: reporter
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              while true; do
+                echo "pod=$POD_NAME node=$NODE_NAME";
+                sleep 60;
+              done
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          resources:
+            requests:
+              cpu: 5m
+              memory: 4Mi
+            limits:
+              cpu: 20m
+              memory: 16Mi

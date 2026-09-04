@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cloud Native Taskboard</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <p class="eyebrow">Kubernetes learning project</p>
+      <h1>Cloud Native Taskboard</h1>
+      <p class="lede">A tiny app on purpose: the interesting part is how it runs.</p>
+    </header>
+
+    <section class="card">
+      <form id="task-form">
+        <label for="title">New task</label>
+        <div class="row">
+          <input id="title" name="title" maxlength="200"
+                 placeholder="Try scaling the API deployment" required />
+          <button type="submit">Add</button>
+        </div>
+      </form>
+      <p id="status" class="status"></p>
+    </section>
+
+    <section class="card">
+      <div class="section-heading">
+        <h2>Tasks</h2>
+        <button id="refresh" class="secondary" type="button">Refresh</button>
+      </div>
+      <ul id="tasks" class="tasks"></ul>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+images:
+  - name: taskboard-api
+    newName: taskboard-api
+    newTag: dev
+  - name: taskboard-frontend
+    newName: taskboard-frontend
+    newTag: dev
+patches:
+  - target:
+      kind: StatefulSet
+      name: taskboard-postgres
+    patch: |-
+      - op: replace
+        path: /spec/volumeClaimTemplates/0/spec/resources/requests/storage
+        value: 512Mi

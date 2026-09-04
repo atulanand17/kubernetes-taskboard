@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22.x"
+          cache-dependency-path: api/go.mod
+
+      - name: Check Go formatting
+        working-directory: api
+        run: test -z "$(gofmt -l .)"
+
+      - name: Download Go modules
+        working-directory: api
+        run: go mod download
+
+      - name: Run Go tests
+        working-directory: api
+        run: go test ./...
+
+      - name: Build API image
+        run: docker build -t taskboard-api:ci ./api
+
+      - name: Build frontend image
+        run: docker build -t taskboard-frontend:ci ./frontend
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Render dev manifests
+        run: kubectl kustomize k8s/overlays/dev >/tmp/taskboard-dev.yaml
+
+      - name: Render prod manifests
+        run: kubectl kustomize k8s/overlays/prod >/tmp/taskboard-prod.yaml

@@ -1,0 +1,54 @@
+# A one-off Job is useful for tasks that must finish successfully once.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: taskboard-db-check
+spec:
+  template:
+    metadata:
+      labels:
+        app: taskboard-db-check
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: db-check
+          image: postgres:16-alpine
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: taskboard-secret
+                  key: DB_PASSWORD
+          command:
+            - sh
+            - -c
+            - >-
+              until pg_isready -h taskboard-postgres -U taskboard -d taskboard; do sleep 2; done;
+              psql -h taskboard-postgres -U taskboard -d taskboard
+              -c 'SELECT COUNT(*) AS task_count FROM tasks;'
+  backoffLimit: 4
+---
+# This scheduled workload is intentionally simple; it demonstrates CronJobs
+# and cluster-local service discovery without adding another app component.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: taskboard-health-check
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: health-check
+              image: curlimages/curl:8.10.1
+              args:
+                - --fail
+                - --silent
+                - --show-error
+                - http://taskboard-api:8080/health/ready

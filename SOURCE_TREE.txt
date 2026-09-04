@@ -1,0 +1,50 @@
+Cloud Native Taskboard - repository contents
+
+api/
+  main.go                 Go REST API and health endpoints
+  main_test.go            Unit tests
+  go.mod                  Go module definition
+  Dockerfile              Multi-stage API image
+
+frontend/
+  index.html               UI markup
+  app.js                   Browser-side API calls
+  styles.css               UI styling
+  nginx.conf               Docker Compose reverse proxy config
+  nginx-k8s.conf           Kubernetes frontend config
+  Dockerfile               Frontend image
+
+db/
+  init.sql                 PostgreSQL schema and seed setup
+
+k8s/base/
+  namespace.yaml           Namespace
+  configmap.yaml           ConfigMap + Secret + DB init ConfigMap
+  postgres.yaml            PostgreSQL Service, StatefulSet, PVC
+  api.yaml                 API Deployment + Service
+  frontend.yaml            Frontend Deployment + Service
+  ingress.yaml             Ingress routing
+  hpa.yaml                 HorizontalPodAutoscaler
+  pdb.yaml                 PodDisruptionBudget
+  learning-workloads.yaml  Job + CronJob
+  kustomization.yaml       Base Kustomize config
+
+k8s/overlays/dev/          Dev Kustomize overlay
+k8s/overlays/prod/         Production-style overlay
+k8s/optional/              RBAC, NetworkPolicy, DaemonSet exercises
+
+scripts/
+  bootstrap-minikube.sh    Build/load/deploy locally
+  smoke-test.sh            Basic API smoke test
+
+docs/
+  architecture.md          Architecture and design notes
+  troubleshooting.md       Kubernetes troubleshooting guide
+  interview-notes.md       Interview discussion prompts
+
+.github/workflows/ci.yml   GitHub Actions checks
+Makefile                   Common developer commands
+docker-compose.yml         Non-Kubernetes baseline
+README.md                  Full setup and learning walkthrough
+LICENSE                    MIT license
+.gitignore                 Git exclusions
