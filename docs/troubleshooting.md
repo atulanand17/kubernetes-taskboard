@@ -65,3 +65,25 @@ kubectl -n ingress-nginx get pods
 ```
 
 For Minikube, confirm the ingress addon is enabled and `taskboard.local` resolves to `minikube ip`.
+
+## Docker build fails with `missing go.sum entry`
+
+The API uses Go modules and the PostgreSQL driver `github.com/jackc/pgx/v5`.
+Both `api/go.mod` and `api/go.sum` are committed to the repository and copied
+into the build image before dependencies are downloaded.
+
+If you change Go dependencies, refresh the module metadata from the `api` directory:
+
+```bash
+cd api
+go mod tidy
+go mod verify
+cd ..
+```
+
+Commit both `go.mod` and `go.sum` after dependency changes. Then rebuild:
+
+```bash
+docker compose build --no-cache api
+docker compose up -d
+```
